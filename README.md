@@ -2,7 +2,7 @@
 
 Memcache that trades a simplified expiry strategy for a super low resource consumption
 
-[![Build Status](https://travis-ci.org/analog-nico/two-buckets-memcache.svg?branch=master)](https://travis-ci.org/analog-nico/two-buckets-memcache) [![Coverage Status](https://coveralls.io/repos/request/two-buckets-memcache/badge.svg?branch=master&service=github)](https://coveralls.io/github/request/two-buckets-memcache?branch=master) [![Dependency Status](https://david-dm.org/analog-nico/two-buckets-memcache.svg)](https://david-dm.org/analog-nico/two-buckets-memcache)
+[![Build Status](https://travis-ci.org/analog-nico/two-buckets-memcache.svg?branch=master)](https://travis-ci.org/analog-nico/two-buckets-memcache) [![Coverage Status](https://coveralls.io/repos/analog-nico/two-buckets-memcache/badge.svg?branch=master&service=github)](https://coveralls.io/github/analog-nico/two-buckets-memcache?branch=master) [![Dependency Status](https://david-dm.org/analog-nico/two-buckets-memcache.svg)](https://david-dm.org/analog-nico/two-buckets-memcache)
 
 ## Installation
 
