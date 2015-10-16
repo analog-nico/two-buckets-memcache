@@ -2,7 +2,7 @@
 
 Memcache that trades a simplified expiry strategy for a super low resource consumption
 
-[![Build Status](https://travis-ci.org/analog-nico/two-buckets-memcache.svg?branch=master)](https://travis-ci.org/analog-nico/two-buckets-memcache) [![Coverage Status](https://coveralls.io/repos/analog-nico/two-buckets-memcache/badge.svg?branch=master&service=github)](https://coveralls.io/github/analog-nico/two-buckets-memcache?branch=master) [![Dependency Status](https://david-dm.org/analog-nico/two-buckets-memcache.svg)](https://david-dm.org/analog-nico/two-buckets-memcache)
+[![Build Status](https://travis-ci.org/analog-nico/two-buckets-memcache.svg?branch=master)](https://travis-ci.org/analog-nico/two-buckets-memcache) [![Coverage Status](https://coveralls.io/repos/request/two-buckets-memcache/badge.svg?branch=master&service=github)](https://coveralls.io/github/request/two-buckets-memcache?branch=master) [![Dependency Status](https://david-dm.org/analog-nico/two-buckets-memcache.svg)](https://david-dm.org/analog-nico/two-buckets-memcache)
 
 ## Installation
 
@@ -16,11 +16,13 @@ npm install two-buckets-memcache --save
 
 ## What is special about this memory cache?
 
-Description forthcoming.
+![Schematic](img/two-buckets-memcache.png)
+
+The milliseconds you pass to the constructor define how soon the cache moves to a new bucket. The newest bucket is always the one in which new entries are stored. After the given milliseconds this bucket gets retired and is only used to get old cache entries. The second time the given milliseconds elapse, the retired bucket gets deleted and the old cache entries it contains expire with it. As a result a stored cache entry expires after 1x to 2x the given milliseconds, i.e. 10-20 seconds.
 
 This design allows a super low resource consumption:
 
-- Just a single timer is used and not a timer for each cache entry like many other memcaches do.
+- Just a single timer is used, instead of one timer for each cache entry like many other memcaches do.
 - The asymptotic runtime for `.get(...)` and `.set(...)` is still O(1) like you would expect.
 
 ## Usage
@@ -36,7 +38,7 @@ cache.get('some key'); // -> { any: value }
 
 cache.get('unknown key'); // -> throws an Error
 
-cache.destroy(); // if cache not needed anymore
+cache.destroy(); // if cache is not needed anymore
 ```
 
 ## Contributing
