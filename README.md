@@ -21,7 +21,23 @@ Description forthcoming.
 This design allows a super low resource consumption:
 
 - Just a single timer is used and not a timer for each cache entry like many other memcaches do.
-- The asymptotic runtime for `.get(...)` and `.set(...)` are still O(1) like you would expect.
+- The asymptotic runtime for `.get(...)` and `.set(...)` is still O(1) like you would expect.
+
+## Usage
+
+``` js
+var TwoBucketsMemcache = require('two-buckets-memcache');
+
+var cache = new TwoBucketsMemcache(10000); // Entries expire in 10-20 seconds.
+
+cache.set('some key', { any: value });
+
+cache.get('some key'); // -> { any: value }
+
+cache.get('unknown key'); // -> throws an Error
+
+cache.destroy(); // if cache not needed anymore
+```
 
 ## Contributing
 
