@@ -16,7 +16,7 @@ npm install two-buckets-memcache --save
 
 ## What is special about this memory cache?
 
-![Schematic](img/two-buckets-memcache.png)
+![Schematic](img/two-buckets-memcache.jpg)
 
 The milliseconds you pass to the constructor define how soon the cache moves to a new bucket. The newest bucket is always the one in which new entries are stored. After the given milliseconds this bucket gets retired and is only used to get old cache entries. The second time the given milliseconds elapse, the retired bucket gets deleted and the old cache entries it contains expire with it. As a result a stored cache entry expires after 1x to 2x the given milliseconds, i.e. 10-20 seconds.
 
