@@ -247,4 +247,146 @@ describe('The Bucket', function () {
 
     });
 
+    describe('should handle all key types when removing an entry', function () {
+
+        it('undefined', function () {
+
+            bucket.set(undefined, 1);
+            expect(bucket.get(undefined)).to.eql(1);
+            bucket.remove(undefined);
+            expect(function () {
+                bucket.get(undefined);
+            }).to.throw();
+
+        });
+
+        it('null', function () {
+
+            bucket.set(null, 1);
+            expect(bucket.get(null)).to.eql(1);
+            bucket.remove(null);
+            expect(function () {
+                bucket.get(null);
+            }).to.throw();
+
+        });
+
+        it('false', function () {
+
+            bucket.set(false, 1);
+            expect(bucket.get(false)).to.eql(1);
+            bucket.remove(false);
+            expect(function () {
+                bucket.get(false);
+            }).to.throw();
+
+        });
+
+        it('zero', function () {
+
+            bucket.set(0, 1);
+            expect(bucket.get(0)).to.eql(1);
+            bucket.remove(0);
+            expect(function () {
+                bucket.get(0);
+            }).to.throw();
+
+        });
+
+        it('0.5', function () {
+
+            bucket.set(0.5, 1);
+            expect(bucket.get(0.5)).to.eql(1);
+            bucket.remove(0.5);
+            expect(function () {
+                bucket.get(0.5);
+            }).to.throw();
+
+        });
+
+        it('123e-5', function () {
+
+            bucket.set(123e-5, 1);
+            expect(bucket.get(123e-5)).to.eql(1);
+            bucket.remove(123e-5);
+            expect(function () {
+                bucket.get(123e-5);
+            }).to.throw();
+
+        });
+
+        it('NaN', function () {
+
+            bucket.set(NaN, 1);
+            expect(bucket.get(NaN)).to.eql(1);
+            bucket.remove(NaN);
+            expect(function () {
+                bucket.get(NaN);
+            }).to.throw();
+
+        });
+
+        it('Infinity', function () {
+
+            bucket.set(Infinity, 1);
+            expect(bucket.get(Infinity)).to.eql(1);
+            bucket.remove(Infinity);
+            expect(function () {
+                bucket.get(Infinity);
+            }).to.throw();
+
+        });
+
+        it('date', function () {
+
+            var date = new Date();
+
+            bucket.set(date, 1);
+            expect(bucket.get(date)).to.eql(1);
+            bucket.remove(date);
+            expect(function () {
+                bucket.get(date);
+            }).to.throw();
+
+        });
+
+        it('array', function () {
+
+            var array = [1,2,3];
+
+            bucket.set(array, 1);
+            expect(bucket.get(array)).to.eql(1);
+            bucket.remove(array);
+            expect(function () {
+                bucket.get(array);
+            }).to.throw();
+
+        });
+
+        it('object', function () {
+
+            var object = { id: 1, name: 'test' };
+
+            bucket.set(object, 1);
+            expect(bucket.get(object)).to.eql(1);
+            bucket.remove(object);
+            expect(function () {
+                bucket.get(object);
+            }).to.throw();
+
+        });
+
+        it('string', function () {
+
+            bucket.set('test', 1);
+            expect(bucket.get('test')).to.eql(1);
+            bucket.remove('test');
+            expect(function () {
+                bucket.get('test');
+            }).to.throw();
+
+        });
+
+    });
+
 });
