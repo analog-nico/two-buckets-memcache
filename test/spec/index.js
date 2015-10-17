@@ -47,6 +47,18 @@ describe('The TwoBucketsMemcache', function () {
 
     });
 
+    it('should allow removing an entry', function () {
+
+        cache.set('test', 1);
+        expect(cache.get('test')).to.eql(1);
+
+        cache.remove('test');
+        expect(function () {
+            cache.get('test');
+        }).to.throw();
+
+    });
+
     it('should be robust against multiple destroy calls', function () {
 
         cache.destroy();
