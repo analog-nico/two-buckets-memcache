@@ -23,7 +23,7 @@ The milliseconds you pass to the constructor define how soon the cache moves to 
 This design allows a super low resource consumption:
 
 - Just a single timer is used, instead of one timer for each cache entry like many other memcaches do.
-- The asymptotic runtime for `.get(...)` and `.set(...)` is still O(1) like you would expect.
+- The asymptotic runtime for `.get(...)`, `.set(...)`, and `.remove(...)` is still O(1) like you would expect.
 
 ## Usage
 
@@ -36,7 +36,9 @@ cache.set('some key', { any: value });
 
 cache.get('some key'); // -> { any: value }
 
-cache.get('unknown key'); // -> throws an Error
+cache.remove('some key');
+
+cache.get('some key'); // -> throws an Error
 
 cache.destroy(); // if cache is not needed anymore
 ```
@@ -57,6 +59,8 @@ If you want to debug a test you should use `gulp test-without-coverage` to run a
 
 ## Change History
 
+- v0.2.0 (2015-10-17)
+    - Added `cache.remove(key)`
 - v0.1.0 (2015-10-16)
     - Initial version
 
