@@ -59,6 +59,20 @@ describe('The TwoBucketsMemcache', function () {
 
     });
 
+    it('should allow removing an entry even if it does not exist', function () {
+
+        cache.set('test', 1);
+        expect(cache.get('test')).to.eql(1);
+
+        cache.remove('test');
+        expect(function () {
+            cache.get('test');
+        }).to.throw();
+
+        cache.remove('test');
+
+    });
+
     it('should allow removing an entry in the retired bucket', function (done) {
 
         cache.set('test', 1);
