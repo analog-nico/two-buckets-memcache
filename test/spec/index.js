@@ -177,6 +177,16 @@ describe('The TwoBucketsMemcache', function () {
 
     });
 
+    it('should throw an error for .set(...) after being destroyed', function () {
+
+        cache.destroy();
+
+        expect(function () {
+            cache.set('test', 1);
+        }).to.throw();
+
+    });
+
     it('should allow .remove(...) after being destroyed', function () {
 
         cache.destroy();
