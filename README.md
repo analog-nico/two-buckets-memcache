@@ -59,6 +59,12 @@ If you want to debug a test you should use `gulp test-without-coverage` to run a
 
 ## Change History
 
+- v0.3.0 (2016-04-03)
+    - Optimized timer usage to use no timer when cache is empty
+      *(Thanks to @blai for his tip in [issue #1](https://github.com/analog-nico/two-buckets-memcache/issues/1))*
+    - Fix: `.set(...)` now throws an `Error` when called after `.destroy()`
+    - Added error messages
+    - Added node v5 to CI build
 - v0.2.0 (2015-10-17)
     - Added `cache.remove(key)`
 - v0.1.0 (2015-10-16)

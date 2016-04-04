@@ -1,6 +1,6 @@
 {
   "name": "two-buckets-memcache",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Memcache that trades a simplified expiry strategy for a super low resource consumption",
   "keywords": [
     "memcache",
