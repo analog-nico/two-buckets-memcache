@@ -13,10 +13,52 @@ describe('The TwoBucketsMemcache', function () {
         cache.destroy();
     });
 
-    it('should cache an entry', function () {
+    it('should cache an entry that has never been set before', function (done) {
 
         cache.set('test', 1);
         expect(cache.get('test')).to.eql(1);
+
+        setTimeout(function () {
+            // In the retired bucket by now...
+            expect(cache.get('test')).to.eql(1);
+            done();
+        }, 15);
+
+    });
+
+    it('should cache an entry that has been set right before', function () {
+
+        cache.set('test', 1);
+        expect(cache.get('test')).to.eql(1);
+
+        cache.set('test', 2);
+        expect(cache.get('test')).to.eql(2);
+
+    });
+
+    it('should cache an entry that has been set in expired bucket', function (done) {
+
+        cache.set('test', 1);
+        expect(cache.get('test')).to.eql(1);
+
+        setTimeout(function () {
+            cache.set('test', 2);
+            expect(cache.get('test')).to.eql(2);
+            done();
+        }, 15);
+
+    });
+
+    it('should cache an entry that has been set before and already expired', function (done) {
+
+        cache.set('test', 1);
+        expect(cache.get('test')).to.eql(1);
+
+        setTimeout(function () {
+            cache.set('test', 2);
+            expect(cache.get('test')).to.eql(2);
+            done();
+        }, 25);
 
     });
 
@@ -28,15 +70,10 @@ describe('The TwoBucketsMemcache', function () {
 
     });
 
-    it('should remove a expired entry', function (done) {
+    it('should remove an expired entry', function (done) {
 
         cache.set('test', 1);
         expect(cache.get('test')).to.eql(1);
-
-        setTimeout(function () {
-            // In the retired bucket by now...
-            expect(cache.get('test')).to.eql(1);
-        }, 15);
 
         setTimeout(function () {
             expect(function () {
@@ -47,7 +84,16 @@ describe('The TwoBucketsMemcache', function () {
 
     });
 
-    it('should allow removing an entry', function () {
+    it('should allow removing an entry that has never been set before', function () {
+
+        cache.remove('test');
+        expect(function () {
+            cache.get('test');
+        }).to.throw();
+
+    });
+
+    it('should allow removing an entry that has been set right before', function () {
 
         cache.set('test', 1);
         expect(cache.get('test')).to.eql(1);
@@ -59,42 +105,47 @@ describe('The TwoBucketsMemcache', function () {
 
     });
 
-    it('should allow removing an entry even if it does not exist', function () {
-
-        cache.set('test', 1);
-        expect(cache.get('test')).to.eql(1);
-
-        cache.remove('test');
-        expect(function () {
-            cache.get('test');
-        }).to.throw();
-
-        cache.remove('test');
-
-    });
-
-    it('should allow removing an entry in the retired bucket', function (done) {
+    it('should allow removing an entry that has been set in expired bucket', function (done) {
 
         cache.set('test', 1);
         expect(cache.get('test')).to.eql(1);
 
         setTimeout(function () {
-
             cache.remove('test');
             expect(function () {
                 cache.get('test');
             }).to.throw();
-
             done();
-
         }, 15);
 
     });
 
-    it('should be robust against multiple destroy calls', function () {
+    it('should allow removing an entry that has been set before and already expired', function (done) {
 
-        cache.destroy();
-        cache.destroy();
+        cache.set('test', 1);
+        expect(cache.get('test')).to.eql(1);
+
+        setTimeout(function () {
+            cache.remove('test');
+            expect(function () {
+                cache.get('test');
+            }).to.throw();
+            done();
+        }, 25);
+
+    });
+
+    it('should allow removing an entry even if it was removed before', function () {
+
+        cache.set('test', 1);
+        expect(cache.get('test')).to.eql(1);
+
+        cache.remove('test');
+        expect(function () {
+            cache.get('test');
+        }).to.throw();
+
+        cache.remove('test');
 
     });
 
@@ -110,6 +161,43 @@ describe('The TwoBucketsMemcache', function () {
             cache.set('test2', 2);
             expect(cache.get('test2')).to.eql(2);
 
+            cache.destroy();
+
+            expect(function () {
+                cache.get('test');
+            }).to.throw();
+
+            expect(function () {
+                cache.get('test2');
+            }).to.throw();
+
+            done();
+
+        }, 15);
+
+    });
+
+    it('should allow .remove(...) after being destroyed', function () {
+
+        cache.destroy();
+
+        cache.remove('test');
+
+    });
+
+    it('should be robust against multiple destroy calls', function (done) {
+
+        cache.set('test', 1);
+        expect(cache.get('test')).to.eql(1);
+
+        setTimeout(function () {
+            // In the retired bucket by now...
+            expect(cache.get('test')).to.eql(1);
+
+            cache.set('test2', 2);
+            expect(cache.get('test2')).to.eql(2);
+
+            cache.destroy();
             cache.destroy();
 
             expect(function () {
