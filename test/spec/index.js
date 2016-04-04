@@ -1,32 +1,37 @@
 'use strict';
 
+var _ = require('lodash');
+var sinon = require('sinon');
+
 var TwoBucketsMemcache = require('../../lib/index.js');
 
 
 describe('The TwoBucketsMemcache', function () {
 
-    var cache;
+    var cache, clock;
+
     beforeEach(function () {
+        clock = sinon.useFakeTimers();
         cache = new TwoBucketsMemcache(10);
     });
 
     afterEach(function () {
         cache.destroy();
+        clock.restore();
     });
 
-    it('should cache an entry that has never been set before', function (done) {
+    it('should cache an entry that has never been set before', function () {
 
         cache.set('test', 1);
         expect(cache.get('test')).to.eql(1);
         cache.set('test2', 2);
         expect(cache.get('test2')).to.eql(2);
 
-        setTimeout(function () {
-            // In the retired bucket by now...
-            expect(cache.get('test')).to.eql(1);
-            expect(cache.get('test2')).to.eql(2);
-            done();
-        }, 15);
+        clock.tick(15);
+
+        // In the retired bucket by now...
+        expect(cache.get('test')).to.eql(1);
+        expect(cache.get('test2')).to.eql(2);
 
     });
 
@@ -40,37 +45,35 @@ describe('The TwoBucketsMemcache', function () {
 
     });
 
-    it('should cache an entry that has been set in expired bucket', function (done) {
+    it('should cache an entry that has been set in expired bucket', function () {
 
         cache.set('test', 1);
         expect(cache.get('test')).to.eql(1);
         cache.set('test2', 2);
         expect(cache.get('test2')).to.eql(2);
 
-        setTimeout(function () {
-            cache.set('test', 3);
-            expect(cache.get('test')).to.eql(3);
-            cache.set('test2', 4);
-            expect(cache.get('test2')).to.eql(4);
-            done();
-        }, 15);
+        clock.tick(15);
+
+        cache.set('test', 3);
+        expect(cache.get('test')).to.eql(3);
+        cache.set('test2', 4);
+        expect(cache.get('test2')).to.eql(4);
 
     });
 
-    it('should cache an entry that has been set before and already expired', function (done) {
+    it('should cache an entry that has been set before and already expired', function () {
 
         cache.set('test', 1);
         expect(cache.get('test')).to.eql(1);
         cache.set('test2', 2);
         expect(cache.get('test2')).to.eql(2);
 
-        setTimeout(function () {
-            cache.set('test', 3);
-            expect(cache.get('test')).to.eql(3);
-            cache.set('test2', 4);
-            expect(cache.get('test2')).to.eql(4);
-            done();
-        }, 25);
+        clock.tick(25);
+
+        cache.set('test', 3);
+        expect(cache.get('test')).to.eql(3);
+        cache.set('test2', 4);
+        expect(cache.get('test2')).to.eql(4);
 
     });
 
@@ -82,74 +85,110 @@ describe('The TwoBucketsMemcache', function () {
 
     });
 
-    it('should get an entry from the retired bucket which is not found in the active bucket', function (done) {
+    it('should get an entry from the retired bucket which is not found in the active bucket', function () {
 
         cache.set('test', 1);
         expect(cache.get('test')).to.eql(1);
 
-        setTimeout(function () {
+        clock.tick(15);
 
-            // Makes sure the active bucket exists
-            cache.set('test2', 2);
-            expect(cache.get('test2')).to.eql(2);
+        // Makes sure the active bucket exists
+        cache.set('test2', 2);
+        expect(cache.get('test2')).to.eql(2);
 
-            // In the retired bucket by now...
-            expect(cache.get('test')).to.eql(1);
-            done();
-
-        }, 15);
+        // In the retired bucket by now...
+        expect(cache.get('test')).to.eql(1);
 
     });
 
-    it('should remove an expired entry (without new active bucket)', function (done) {
+    it('should remove an expired entry (without new active bucket)', function () {
 
         cache.set('test', 1);
         expect(cache.get('test')).to.eql(1);
-        setTimeout(function () {
-            cache.set('test2', 2);
-            expect(cache.get('test2')).to.eql(2);
-        }, 1);
-        setTimeout(function () {
-            cache.set('test3', 3);
-            expect(cache.get('test3')).to.eql(3);
-        }, 8);
 
-        setTimeout(function () {
-            expect(function () {
-                cache.get('test');
-            }).to.throw();
-            expect(function () {
-                cache.get('test2');
-            }).to.throw();
-            expect(function () {
-                cache.get('test3');
-            }).to.throw();
-            done();
-        }, 25);
+        clock.tick(1);
+
+        cache.set('test2', 2);
+        expect(cache.get('test2')).to.eql(2);
+
+        clock.tick(7);
+
+        cache.set('test3', 3);
+        expect(cache.get('test3')).to.eql(3);
+
+        clock.tick(17);
+
+        expect(function () {
+            cache.get('test');
+        }).to.throw();
+        expect(function () {
+            cache.get('test2');
+        }).to.throw();
+        expect(function () {
+            cache.get('test3');
+        }).to.throw();
 
     });
 
-    it('should remove an expired entry (with new active bucket)', function (done) {
+    it('should remove an expired entry (with new active bucket)', function () {
 
         cache.set('test', 1);
         expect(cache.get('test')).to.eql(1);
-        setTimeout(function () {
-            cache.set('test2', 2);
-            expect(cache.get('test2')).to.eql(2);
-        }, 15);
-        setTimeout(function () {
-            cache.set('test3', 3);
-            expect(cache.get('test3')).to.eql(3);
-        }, 16);
 
-        setTimeout(function () {
-            expect(function () {
-                cache.get('test');
-            }).to.throw();
-            expect(cache.get('test2')).to.eql(2);
-            expect(cache.get('test3')).to.eql(3);
-            done();
-        }, 25);
+        clock.tick(15);
+
+        cache.set('test2', 2);
+        expect(cache.get('test2')).to.eql(2);
+
+        clock.tick(1);
+
+        cache.set('test3', 3);
+        expect(cache.get('test3')).to.eql(3);
+
+        clock.tick(9);
+
+        expect(function () {
+            cache.get('test');
+        }).to.throw();
+        expect(cache.get('test2')).to.eql(2);
+        expect(cache.get('test3')).to.eql(3);
+
+    });
+
+    it('should remove an expired entry (with new active and retired bucket)', function () {
+
+        cache.set('test', 1);
+        expect(cache.get('test')).to.eql(1);
+
+        clock.tick(15);
+
+        cache.set('test2', 2);
+        expect(cache.get('test2')).to.eql(2);
+
+        clock.tick(1);
+
+        cache.set('test3', 3);
+        expect(cache.get('test3')).to.eql(3);
+
+        clock.tick(9);
+
+        cache.set('test4', 4);
+        expect(cache.get('test4')).to.eql(4);
+
+        clock.tick(1);
+
+        cache.set('test5', 5);
+        expect(cache.get('test5')).to.eql(5);
+
+        clock.tick(1);
+
+        expect(function () {
+            cache.get('test');
+        }).to.throw();
+        expect(cache.get('test2')).to.eql(2);
+        expect(cache.get('test3')).to.eql(3);
+        expect(cache.get('test4')).to.eql(4);
+        expect(cache.get('test5')).to.eql(5);
 
     });
 
@@ -174,55 +213,49 @@ describe('The TwoBucketsMemcache', function () {
 
     });
 
-    it('should allow removing an entry that has been set in expired bucket', function (done) {
+    it('should allow removing an entry that has been set in expired bucket', function () {
 
         cache.set('test', 1);
         expect(cache.get('test')).to.eql(1);
 
-        setTimeout(function () {
-            cache.remove('test');
-            expect(function () {
-                cache.get('test');
-            }).to.throw();
-            done();
-        }, 15);
+        clock.tick(15);
+
+        cache.remove('test');
+        expect(function () {
+            cache.get('test');
+        }).to.throw();
 
     });
 
-    it('should allow removing an entry that has been set in expired and active bucket', function (done) {
+    it('should allow removing an entry that has been set in expired and active bucket', function () {
 
         cache.set('test', 1);
         expect(cache.get('test')).to.eql(1);
 
-        setTimeout(function () {
+        clock.tick(15);
 
-            cache.set('test', 2);
-            expect(cache.get('test')).to.eql(2);
+        cache.set('test', 2);
+        expect(cache.get('test')).to.eql(2);
 
-            cache.remove('test');
+        cache.remove('test');
 
-            expect(function () {
-                cache.get('test');
-            }).to.throw();
-
-            done();
-
-        }, 15);
+        expect(function () {
+            cache.get('test');
+        }).to.throw();
 
     });
 
-    it('should allow removing an entry that has been set before and already expired', function (done) {
+    it('should allow removing an entry that has been set before and already expired', function () {
 
         cache.set('test', 1);
         expect(cache.get('test')).to.eql(1);
 
-        setTimeout(function () {
-            cache.remove('test');
-            expect(function () {
-                cache.get('test');
-            }).to.throw();
-            done();
-        }, 25);
+        clock.tick(25);
+
+        cache.remove('test');
+        expect(function () {
+            cache.get('test');
+        }).to.throw();
 
     });
 
@@ -240,31 +273,28 @@ describe('The TwoBucketsMemcache', function () {
 
     });
 
-    it('should not return an entry after destroy anymore', function (done) {
+    it('should not return an entry after destroy anymore', function () {
 
         cache.set('test', 1);
         expect(cache.get('test')).to.eql(1);
 
-        setTimeout(function () {
-            // In the retired bucket by now...
-            expect(cache.get('test')).to.eql(1);
+        clock.tick(15);
 
-            cache.set('test2', 2);
-            expect(cache.get('test2')).to.eql(2);
+        // In the retired bucket by now...
+        expect(cache.get('test')).to.eql(1);
 
-            cache.destroy();
+        cache.set('test2', 2);
+        expect(cache.get('test2')).to.eql(2);
 
-            expect(function () {
-                cache.get('test');
-            }).to.throw();
+        cache.destroy();
 
-            expect(function () {
-                cache.get('test2');
-            }).to.throw();
+        expect(function () {
+            cache.get('test');
+        }).to.throw();
 
-            done();
-
-        }, 15);
+        expect(function () {
+            cache.get('test2');
+        }).to.throw();
 
     });
 
@@ -286,32 +316,87 @@ describe('The TwoBucketsMemcache', function () {
 
     });
 
-    it('should be robust against multiple destroy calls', function (done) {
+    it('should be robust against multiple destroy calls', function () {
 
         cache.set('test', 1);
         expect(cache.get('test')).to.eql(1);
 
-        setTimeout(function () {
-            // In the retired bucket by now...
-            expect(cache.get('test')).to.eql(1);
+        clock.tick(15);
 
-            cache.set('test2', 2);
-            expect(cache.get('test2')).to.eql(2);
+        // In the retired bucket by now...
+        expect(cache.get('test')).to.eql(1);
 
-            cache.destroy();
-            cache.destroy();
+        cache.set('test2', 2);
+        expect(cache.get('test2')).to.eql(2);
 
-            expect(function () {
-                cache.get('test');
-            }).to.throw();
+        cache.destroy();
+        cache.destroy();
 
-            expect(function () {
-                cache.get('test2');
-            }).to.throw();
+        expect(function () {
+            cache.get('test');
+        }).to.throw();
 
-            done();
+        expect(function () {
+            cache.get('test2');
+        }).to.throw();
 
-        }, 15);
+    });
+
+    it('should be able to fight the monkey', function (done) {
+
+        this.timeout(20000);
+
+        var spansOrig = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,25];
+        var repetitions = 50;
+
+        var pending = (spansOrig.length + 1) * repetitions;
+        function finishOne() {
+            pending -= 1;
+            if (pending === 0) {
+                done();
+            }
+        }
+
+        _.times(repetitions, function () {
+
+            var spans = _.shuffle(_.clone(spansOrig));
+            spans.splice(0,0,0);
+            for ( var i = 1; i < spans.length; i+=1 ) {
+                spans[i] += spans[i-1];
+            }
+
+            _.forEach(spans, function (span) {
+                setTimeout(function () {
+
+                    var entryName = 'test' + span;
+
+                    cache.set(entryName, span);
+
+                    setTimeout(function () {
+                        expect(cache.get(entryName)).to.eql(span);
+                    }, 9);
+
+                    setTimeout(function () {
+                        try {
+                            expect(function () {
+                                cache.get(entryName);
+                            }).to.throw();
+                        } catch (e) {
+                            console.dir(spans);
+                            console.log('Error for span: ' + span);
+                            throw e;
+                        }
+                        finishOne();
+                    }, 21);
+
+                }, span);
+            });
+
+        });
+
+        while (pending > 0) {
+            clock.tick(1);
+        }
 
     });
 

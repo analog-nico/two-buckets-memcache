@@ -38,7 +38,9 @@
     "gulp-jshint": "2.0.x",
     "gulp-mocha": "2.2.x",
     "jshint-stylish": "2.1.x",
+    "lodash": "4.7.x",
     "rimraf": "2.5.x",
-    "run-sequence": "1.1.x"
+    "run-sequence": "1.1.x",
+    "sinon": "1.17.x"
   }
 }
