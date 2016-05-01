@@ -45,7 +45,7 @@ cache.destroy(); // if cache is not needed anymore
 
 ## Contributing
 
-To set up your development environment for Quota:
+To set up your development environment for two-buckets-memcache:
 
 1. Clone this repo to your desktop,
 2. in the shell `cd` to the main folder,
