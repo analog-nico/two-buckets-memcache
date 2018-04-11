@@ -12,11 +12,14 @@ describe('The Bucket', function () {
     it('should cache a value', function () {
 
         bucket.set('test', 1);
+        expect(bucket.has('test')).to.eql(true);
         expect(bucket.get('test')).to.eql(1);
 
     });
 
     it('should throw an error if trying to get value for a key that is not set', function () {
+
+        expect(bucket.has('not set')).to.eql(false);
 
         expect(function () {
             bucket.get('not set');
@@ -27,6 +30,7 @@ describe('The Bucket', function () {
     it('should allow removing an entry', function () {
 
         bucket.set('test', 1);
+        expect(bucket.has('test')).to.eql(true);
         expect(bucket.get('test')).to.eql(1);
         bucket.remove('test');
         expect(function () {
@@ -38,6 +42,7 @@ describe('The Bucket', function () {
     it('should allow reserved object properties as keys', function () {
 
         bucket.set('__proto__', 1);
+        expect(bucket.has('__proto__')).to.eql(true);
         expect(bucket.get('__proto__')).to.eql(1);
 
     });
@@ -47,6 +52,8 @@ describe('The Bucket', function () {
         it('undefined', function () {
 
             bucket.set(undefined, 1);
+            expect(bucket.has(undefined)).to.eql(true);
+            expect(bucket.has(String(undefined))).to.eql(true);
             bucket.set(String(undefined), 2);
             expect(bucket.get(undefined)).to.eql(2);
             expect(bucket.get(String(undefined))).to.eql(2);
@@ -56,6 +63,8 @@ describe('The Bucket', function () {
         it('null', function () {
 
             bucket.set(null, 1);
+            expect(bucket.has(null)).to.eql(true);
+            expect(bucket.has(String(null))).to.eql(true);
             bucket.set(String(null), 2);
             expect(bucket.get(null)).to.eql(2);
             expect(bucket.get(String(null))).to.eql(2);
@@ -65,6 +74,8 @@ describe('The Bucket', function () {
         it('false', function () {
 
             bucket.set(false, 1);
+            expect(bucket.has(false)).to.eql(true);
+            expect(bucket.has(String(false))).to.eql(true);
             bucket.set(String(false), 2);
             expect(bucket.get(false)).to.eql(2);
             expect(bucket.get(String(false))).to.eql(2);
@@ -74,6 +85,8 @@ describe('The Bucket', function () {
         it('zero', function () {
 
             bucket.set(0, 1);
+            expect(bucket.has(0)).to.eql(true);
+            expect(bucket.has(String(0))).to.eql(true);
             bucket.set(String(0), 2);
             expect(bucket.get(0)).to.eql(2);
             expect(bucket.get(String(0))).to.eql(2);
@@ -83,6 +96,8 @@ describe('The Bucket', function () {
         it('0.5', function () {
 
             bucket.set(0.5, 1);
+            expect(bucket.has(0.5)).to.eql(true);
+            expect(bucket.has(String(0.5))).to.eql(true);
             bucket.set(String(0.5), 2);
             expect(bucket.get(0.5)).to.eql(2);
             expect(bucket.get(String(0.5))).to.eql(2);
@@ -92,6 +107,8 @@ describe('The Bucket', function () {
         it('123e-5', function () {
 
             bucket.set(123e-5, 1);
+            expect(bucket.has(123e-5)).to.eql(true);
+            expect(bucket.has(String(123e-5))).to.eql(true);
             bucket.set(String(123e-5), 2);
             expect(bucket.get(123e-5)).to.eql(2);
             expect(bucket.get(String(123e-5))).to.eql(2);
@@ -101,6 +118,8 @@ describe('The Bucket', function () {
         it('NaN', function () {
 
             bucket.set(NaN, 1);
+            expect(bucket.has(NaN)).to.eql(true);
+            expect(bucket.has(String(NaN))).to.eql(true);
             bucket.set(String(NaN), 2);
             expect(bucket.get(NaN)).to.eql(2);
             expect(bucket.get(String(NaN))).to.eql(2);
@@ -110,6 +129,8 @@ describe('The Bucket', function () {
         it('Infinity', function () {
 
             bucket.set(Infinity, 1);
+            expect(bucket.has(Infinity)).to.eql(true);
+            expect(bucket.has(String(Infinity))).to.eql(true);
             bucket.set(String(Infinity), 2);
             expect(bucket.get(Infinity)).to.eql(2);
             expect(bucket.get(String(Infinity))).to.eql(2);
@@ -121,6 +142,8 @@ describe('The Bucket', function () {
             var date = new Date();
 
             bucket.set(date, 1);
+            expect(bucket.has(date)).to.eql(true);
+            expect(bucket.has(String(date))).to.eql(true);
             bucket.set(String(date), 2);
             expect(bucket.get(date)).to.eql(2);
             expect(bucket.get(String(date))).to.eql(2);
@@ -132,6 +155,8 @@ describe('The Bucket', function () {
             var array = [1,2,3];
 
             bucket.set(array, 1);
+            expect(bucket.has(array)).to.eql(true);
+            expect(bucket.has(String(array))).to.eql(true);
             bucket.set(String(array), 2);
             expect(bucket.get(array)).to.eql(2);
             expect(bucket.get(String(array))).to.eql(2);
@@ -143,6 +168,8 @@ describe('The Bucket', function () {
             var object = { id: 1, name: 'test' };
 
             bucket.set(object, 1);
+            expect(bucket.has(object)).to.eql(true);
+            expect(bucket.has(String(object))).to.eql(true);
             bucket.set(String(object), 2);
             expect(bucket.get(object)).to.eql(2);
             expect(bucket.get(String(object))).to.eql(2);
@@ -152,6 +179,8 @@ describe('The Bucket', function () {
         it('string', function () {
 
             bucket.set('test', 1);
+            expect(bucket.has('test')).to.eql(true);
+            expect(bucket.has(String('test'))).to.eql(true);
             bucket.set(String('test'), 2);
             expect(bucket.get('test')).to.eql(2);
             expect(bucket.get(String('test'))).to.eql(2);
