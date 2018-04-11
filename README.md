@@ -61,6 +61,8 @@ If you want to debug a test you should use `gulp test-without-coverage` to run a
 
 ## Change History
 
+- v0.4.0 (2018-04-11)
+    - Introduced `.has(key)` function
 - v0.3.1 (2018-04-11)
     - Fix: Allow reserved object property names to be used as keys
 - v0.3.0 (2016-04-03)
