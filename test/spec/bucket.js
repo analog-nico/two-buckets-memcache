@@ -35,6 +35,13 @@ describe('The Bucket', function () {
 
     });
 
+    it('should allow reserved object properties as keys', function () {
+
+        bucket.set('__proto__', 1);
+        expect(bucket.get('__proto__')).to.eql(1);
+
+    });
+
     describe('should handle all key types converted to a string', function () {
 
         it('undefined', function () {
