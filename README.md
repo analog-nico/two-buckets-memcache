@@ -59,6 +59,8 @@ If you want to debug a test you should use `gulp test-without-coverage` to run a
 
 ## Change History
 
+- v0.3.1 (2018-04-11)
+    - Fix: Allow reserved object property names to be used as keys
 - v0.3.0 (2016-04-03)
     - Optimized timer usage to use no timer when cache is empty
       *(Thanks to @blai for his tip in [issue #1](https://github.com/analog-nico/two-buckets-memcache/issues/1))*
