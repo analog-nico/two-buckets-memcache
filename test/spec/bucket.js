@@ -425,4 +425,76 @@ describe('The Bucket', function () {
 
     });
 
+    describe('should convert to array', function () {
+
+        it('when empty', function () {
+
+            expect(bucket.toArray()).to.eql([]);
+
+            bucket.set('x', 'y');
+            bucket.remove('x');
+
+            expect(bucket.toArray()).to.eql([]);
+
+        });
+
+        it('when filled', function () {
+
+            bucket.set('a', 'b');
+            bucket.set('c', 'd');
+            bucket.set('e', 'f');
+            bucket.remove('c');
+
+            expect(bucket.toArray()).to.eql([
+                ['a', 'b'],
+                ['e', 'f']
+            ]);
+
+        });
+
+        it('with caching', function () {
+
+            bucket.set('a', 'b');
+            bucket.set('c', 'd');
+            bucket.set('e', 'f');
+
+            var arr1 = bucket.toArray();
+            var arr2 = bucket.toArray();
+
+            expect(arr1).to.eql(arr2);
+
+            bucket.set('a', 'b');
+            bucket.set('g', 'h');
+
+            var arr3 = bucket.toArray();
+
+            expect(arr3).to.not.eql(arr2);
+
+            bucket.has('a');
+            bucket.has('z');
+
+            var arr4 = bucket.toArray();
+
+            expect(arr4).to.eql(arr3);
+
+            bucket.get('a');
+            expect(function () {
+                bucket.get('z');
+            }).to.throw();
+
+            var arr5 = bucket.toArray();
+
+            expect(arr5).to.eql(arr4);
+
+            bucket.remove('c');
+            bucket.remove('z');
+
+            var arr6 = bucket.toArray();
+
+            expect(arr6).to.not.eql(arr5);
+
+        });
+
+    });
+
 });
