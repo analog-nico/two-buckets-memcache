@@ -743,6 +743,35 @@ describe('The TwoBucketsMemcache', function () {
 
         });
 
+        it('and ignore error thrown in callbacks', function () {
+
+            var countNotifications = 0;
+            var countErrors = 0;
+
+            cache.listenPurge(function () {
+                countErrors += 1;
+                throw new Error();
+            });
+            cache.listenPurge(function () {
+                countNotifications += 1;
+            });
+            cache.listenPurge(function () {
+                countErrors += 1;
+                throw new Error();
+            });
+
+            cache.set('test', 1);
+
+            clock.tick(10);
+            clock.tick(9);
+            expect(countNotifications).to.eql(0);
+            expect(countErrors).to.eql(0);
+            clock.tick(1);
+            expect(countNotifications).to.eql(1);
+            expect(countErrors).to.eql(2);
+
+        });
+
     });
 
 });
