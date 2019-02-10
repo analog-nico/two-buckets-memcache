@@ -18,7 +18,7 @@ npm install two-buckets-memcache --save
 
 ![Schematic](img/two-buckets-memcache.jpg)
 
-The milliseconds you pass to the constructor define how soon the cache moves to a new bucket. The newest bucket is always the one in which new entries are stored. After the given milliseconds this bucket gets retired and is only used to get old cache entries. The second time the given milliseconds elapse, the retired bucket gets deleted and the old cache entries it contains expire with it. As a result a stored cache entry expires after 1x to 2x the given milliseconds, i.e. 10-20 seconds.
+The milliseconds you pass to the constructor define how soon the cache moves to a new bucket. The newest bucket is always the one in which new entries are stored. After the given milliseconds this bucket gets retired and is only used to get old cache entries. The second time the given milliseconds elapse, the retired bucket gets purged and the old cache entries it contains expire with it. As a result a stored cache entry expires after 1x to 2x the given milliseconds, i.e. 10-20 seconds.
 
 This design allows a super low resource consumption:
 
@@ -32,17 +32,67 @@ var TwoBucketsMemcache = require('two-buckets-memcache');
 
 var cache = new TwoBucketsMemcache(10000); // Entries expire in 10-20 seconds.
 
-cache.set('some key', { any: value });
+cache.set('some key', { any: 'value' });
 
 cache.has('some key'); // -> true
 
-cache.get('some key'); // -> { any: value }
+cache.get('some key'); // -> { any: 'value' }
 
 cache.remove('some key');
 
 cache.get('some key'); // -> throws an Error
 
 cache.destroy(); // if cache is not needed anymore
+```
+
+### Changing the Expiration Speed
+
+``` js
+var TwoBucketsMemcache = require('two-buckets-memcache');
+
+var cache = new TwoBucketsMemcache(10000); // Entries expire in 10-20 seconds.
+
+// ...work with the cache.
+
+cache.changeExpireAfter(5000); // Entries now expire in 5-10 seconds.
+```
+
+When passing a smaller milliseconds amount (= speeding up) then the change applies right away. That means that already the existing buckets will retire / be purged earlier than previously configured.
+
+When passing a smaller milliseconds amount (= speeding down) then the change applies after the next bucket switch. That means that the existing buckets will retire / be purged according to the old milliseconds amount. Afterwards, the then retired bucket and a newly created bucket will retire / be purged according to the new milliseconds amount.
+
+### Listening to Buckets about to be Purged
+
+``` js
+var TwoBucketsMemcache = require('two-buckets-memcache');
+
+var cache = new TwoBucketsMemcache(10000); // Entries expire in 10-20 seconds.
+
+var listenerId = cache.listenPurge(function (bucket) {
+    console.log(JSON.stringify(bucket));
+});
+
+// Add entries to the active bucket:
+cache.set('some key', { any: 'value' });
+cache.set('some other key', { any: 'other value' });
+
+// ...wait 10 seconds and the active bucket retires.
+// ...wait another 10 seconds and the now retired bucket is about to be purged.
+// Callback above gets called and writes to the console: [['some key', { any: 'value' }], ['some other key', { any: 'other value' }]]
+
+// You may stop listening:
+cache.unlistenPurge(listenerId);
+```
+
+It is possible to access the cache within the callback:
+``` js
+var listenerId = cache.listenPurge(function (bucket) {
+    
+    cache.get(...); // Retrieves entries from bucket that is about to be purged as well.
+    
+    cache.set(...); // Adds the entry to the active bucket that will retire along with the about to be purged bucket.
+    
+});
 ```
 
 ## Contributing
@@ -61,6 +111,10 @@ If you want to debug a test you should use `gulp test-without-coverage` to run a
 
 ## Change History
 
+- v1.0.0 (Forthcoming)
+    - **Breaking Change**: Only EcmaScript v5.1 environments and node.js v4 or higher supported
+    - Feat: Changing the expiration speed with `.changeExpireAfter(...)`
+    - Feat: Listening to buckets about to be purged with `.listenPurge(...)` and `.unlistenPurge(...)`
 - v0.4.0 (2018-04-11)
     - Introduced `.has(key)` function
 - v0.3.1 (2018-04-11)
