@@ -111,7 +111,7 @@ If you want to debug a test you should use `gulp test-without-coverage` to run a
 
 ## Change History
 
-- v1.0.0 (Forthcoming)
+- v1.0.0 (2019-02-09)
     - **Breaking Change**: Only EcmaScript v5.1 environments and node.js v4 or higher supported
     - Feat: Changing the expiration speed with `.changeExpireAfter(...)`
     - Feat: Listening to buckets about to be purged with `.listenPurge(...)` and `.unlistenPurge(...)`
