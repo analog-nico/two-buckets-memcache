@@ -655,7 +655,7 @@ describe('The TwoBucketsMemcache', function () {
 
         });
 
-        it('with allowing to set cache in callback (without active bucket)', function (done) {
+        it('with allowing to access cache in callback (without active bucket)', function (done) {
 
             var phase = 0;
 
@@ -667,6 +667,15 @@ describe('The TwoBucketsMemcache', function () {
                         break;
                     case 2:
                         expect(bucket).to.eql([['test2', 2], ['test3', 3]]);
+                        expect(cache.has('test')).to.eql(false);
+                        expect(cache.has('test2')).to.eql(true);
+                        expect(cache.has('test3')).to.eql(true);
+                        expect(cache.get('test2')).to.eql(2);
+                        expect(cache.get('test3')).to.eql(3);
+                        cache.remove('test2');
+                        cache.remove('test3');
+                        expect(cache.has('test2')).to.eql(false);
+                        expect(cache.has('test3')).to.eql(false);
                         done();
                 }
             });
@@ -687,7 +696,7 @@ describe('The TwoBucketsMemcache', function () {
 
         });
 
-        it('with allowing to set cache in callback (with active bucket)', function (done) {
+        it('with allowing to access cache in callback (with active bucket)', function (done) {
 
             var phase = 0;
 
@@ -699,6 +708,19 @@ describe('The TwoBucketsMemcache', function () {
                         break;
                     case 2:
                         expect(bucket).to.eql([['test2', 2], ['test3', 3]]);
+                        expect(cache.has('test')).to.eql(false);
+                        expect(cache.has('test2')).to.eql(true);
+                        expect(cache.has('test3')).to.eql(true);
+                        expect(cache.has('test4')).to.eql(true);
+                        expect(cache.get('test2')).to.eql(2);
+                        expect(cache.get('test3')).to.eql(3);
+                        expect(cache.get('test4')).to.eql(4);
+                        cache.remove('test2');
+                        cache.remove('test3');
+                        cache.remove('test4');
+                        expect(cache.has('test2')).to.eql(false);
+                        expect(cache.has('test3')).to.eql(false);
+                        expect(cache.has('test4')).to.eql(false);
                         done();
                 }
             });
