@@ -553,4 +553,174 @@ describe('The TwoBucketsMemcache', function () {
 
     });
 
+    describe('should notify about purged bucket', function () {
+
+        it('with single listener', function () {
+
+            var countNotifications = 0;
+
+            cache.listenPurge(function () {
+                countNotifications += 1;
+            });
+
+            clock.tick(10);
+
+            cache.set('test', 1);
+
+            clock.tick(10);
+            clock.tick(9);
+            expect(countNotifications).to.eql(0);
+            clock.tick(1);
+            expect(countNotifications).to.eql(1);
+
+        });
+
+        it('with single listener registered multiple times', function () {
+
+            var countNotifications = 0;
+
+            var callback = function () {
+                countNotifications += 1;
+            };
+
+            cache.unlistenPurge('fake id');
+            var listenerId = cache.listenPurge(callback);
+            cache.unlistenPurge(listenerId);
+            cache.unlistenPurge(listenerId);
+            cache.listenPurge(callback);
+            cache.listenPurge(callback);
+
+            clock.tick(10);
+
+            cache.set('test', 1);
+
+            clock.tick(10);
+            clock.tick(9);
+            expect(countNotifications).to.eql(0);
+            clock.tick(1);
+            expect(countNotifications).to.eql(2);
+
+        });
+
+        it('with multiple listeners', function () {
+
+            var countNotifications = 0;
+
+            var listenerId1 = cache.listenPurge(function () {
+                countNotifications += 1;
+            });
+            var listenerId2 = cache.listenPurge(function () {
+                countNotifications += 1;
+            });
+            cache.listenPurge(function () {
+                countNotifications += 10;
+            });
+            cache.listenPurge(function () {
+                countNotifications += 100;
+            });
+            cache.unlistenPurge(listenerId2);
+            cache.unlistenPurge(listenerId1);
+
+            clock.tick(10);
+
+            cache.set('test', 1);
+
+            clock.tick(10);
+            clock.tick(9);
+            expect(countNotifications).to.eql(0);
+            clock.tick(1);
+            expect(countNotifications).to.eql(110);
+
+        });
+
+        it('with retiring bucket as parameter', function (done) {
+
+            var expectNotification = false;
+
+            cache.listenPurge(function (bucket) {
+                expect(expectNotification).to.eql(true);
+                expect(bucket).to.eql([['test', 1]]);
+                done();
+            });
+
+            cache.set('test', 1);
+
+            clock.tick(10);
+
+            cache.set('test2', 2);
+
+            clock.tick(9);
+            expectNotification = true;
+            clock.tick(1);
+
+        });
+
+        it('with allowing to set cache in callback (without active bucket)', function (done) {
+
+            var phase = 0;
+
+            cache.listenPurge(function (bucket) {
+                expect(phase).to.not.eql(0);
+                switch (phase) {
+                    case 1:
+                        cache.set('test3', 3);
+                        break;
+                    case 2:
+                        expect(bucket).to.eql([['test2', 2], ['test3', 3]]);
+                        done();
+                }
+            });
+
+            cache.set('test', 1);
+
+            clock.tick(10);
+
+            cache.set('test2', 2);
+
+            clock.tick(9);
+            phase = 1;
+            clock.tick(1);
+
+            clock.tick(9);
+            phase = 2;
+            clock.tick(1);
+
+        });
+
+        it('with allowing to set cache in callback (with active bucket)', function (done) {
+
+            var phase = 0;
+
+            cache.listenPurge(function (bucket) {
+                expect(phase).to.not.eql(0);
+                switch (phase) {
+                    case 1:
+                        cache.set('test3', 3);
+                        break;
+                    case 2:
+                        expect(bucket).to.eql([['test2', 2], ['test3', 3]]);
+                        done();
+                }
+            });
+
+            cache.set('test', 1);
+
+            clock.tick(10);
+
+            cache.set('test2', 2);
+
+            clock.tick(9);
+            phase = 1;
+            clock.tick(1);
+
+            cache.set('test4', 4);
+
+            clock.tick(9);
+            phase = 2;
+            clock.tick(1);
+
+        });
+
+    });
+
 });
