@@ -1,8 +1,21 @@
 'use strict';
 
+var sinon = require('sinon');
+
 var Timeout = require('../../lib/timeout.js');
 
+
 describe('The Timeout', function () {
+
+    var clock;
+
+    beforeEach(function () {
+        clock = sinon.useFakeTimers();
+    });
+
+    afterEach(function () {
+        clock.restore();
+    });
 
     it('should call the callback without delay', function (done) {
         /*jshint nonew:false */
@@ -10,6 +23,8 @@ describe('The Timeout', function () {
         new Timeout(function () {
             done();
         });
+
+        clock.tick(1);
 
     });
 
@@ -23,6 +38,8 @@ describe('The Timeout', function () {
             done();
         }, 10);
 
+        clock.tick(10);
+
     });
 
     it('should return the elapsed time', function (done) {
@@ -34,6 +51,8 @@ describe('The Timeout', function () {
             done();
         }, 5);
 
+        clock.tick(5);
+
     });
 
     it('should return the elapsed time even after the timeout fired', function (done) {
@@ -44,6 +63,8 @@ describe('The Timeout', function () {
             expect(timeout.getTimeElapsed()).to.be.above(9);
             done();
         }, 10);
+
+        clock.tick(10);
 
     });
 
@@ -67,6 +88,9 @@ describe('The Timeout', function () {
             expect(timeoutsFired).to.eql(0);
             done();
         }, 15);
+
+        clock.tick(1);
+        clock.tick(14);
 
     });
 
