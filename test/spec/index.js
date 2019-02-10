@@ -467,4 +467,90 @@ describe('The TwoBucketsMemcache', function () {
 
     });
 
+    describe('should allow changing the expiry', function () {
+
+        it('by speeding down', function () {
+
+            cache.set('test', 1);
+
+            clock.tick(19);
+            expect(cache.has('test')).to.eql(true);
+            clock.tick(1);
+            expect(cache.has('test')).to.eql(false);
+
+            cache.set('test2', 2);
+
+            clock.tick(5);
+
+            cache.changeExpireAfter(15); // -> fires on 10 and 25
+
+            clock.tick(19);
+            expect(cache.has('test2')).to.eql(true);
+            clock.tick(1);
+            expect(cache.has('test2')).to.eql(false);
+
+        });
+
+        it('by keeping the same speed', function () {
+
+            cache.set('test', 1);
+
+            clock.tick(19);
+            expect(cache.has('test')).to.eql(true);
+            clock.tick(1);
+            expect(cache.has('test')).to.eql(false);
+
+            cache.set('test2', 2);
+
+            clock.tick(5);
+
+            cache.changeExpireAfter(10); // -> fires on 10 and 20
+
+            clock.tick(14);
+            expect(cache.has('test2')).to.eql(true);
+            clock.tick(1);
+            expect(cache.has('test2')).to.eql(false);
+
+        });
+
+        it('by speeding up without a timer running', function () {
+
+            cache.changeExpireAfter(7);
+
+            cache.set('test', 1);
+
+            clock.tick(7+6);
+            expect(cache.has('test')).to.eql(true);
+            clock.tick(1);
+            expect(cache.has('test')).to.eql(false);
+
+        });
+
+        it('by speeding up with a timer running', function () {
+
+            cache.set('test', 1);
+
+            clock.tick(5);
+
+            cache.changeExpireAfter(7);
+
+            clock.tick(2+6);
+            expect(cache.has('test')).to.eql(true);
+            clock.tick(1);
+            expect(cache.has('test')).to.eql(false);
+
+        });
+
+        it('unless the cache is destroyed', function () {
+
+            cache.destroy();
+
+            expect(function () {
+                cache.changeExpireAfter(7);
+            }).to.throw();
+
+        });
+
+    });
+
 });
