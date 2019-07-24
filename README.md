@@ -101,16 +101,17 @@ To set up your development environment for two-buckets-memcache:
 
 1. Clone this repo to your desktop,
 2. in the shell `cd` to the main folder,
-3. hit `npm install`,
-4. hit `npm install gulp -g` if you haven't installed gulp globally yet, and
-5. run `gulp dev`. (Or run `node ./node_modules/.bin/gulp dev` if you don't want to install gulp globally.)
+3. hit `npm install`, and
+5. run `npm run dev`.
 
-`gulp dev` watches all source files and if you save some changes it will lint the code and execute all tests. The test coverage report can be viewed from `./coverage/lcov-report/index.html`.
+`npm run dev` watches all source files and if you save some changes it will lint the code and execute all tests. The test coverage report can be viewed from `./coverage/lcov-report/index.html`.
 
-If you want to debug a test you should use `gulp test-without-coverage` to run all tests without obscuring the code by the test coverage instrumentation.
+If you want to debug a test you should use `npm run test-no-cov` to run all tests without obscuring the code by the test coverage instrumentation.
 
 ## Change History
 
+- v1.0.1 (upcoming)
+    - Chore: Added node v12 to ci build and updated dev dependencies to support node v12
 - v1.0.0 (2019-02-09)
     - **Breaking Change**: Only EcmaScript v5.1 environments and node.js v4 or higher supported
     - Feat: Changing the expiration speed with `.changeExpireAfter(...)`

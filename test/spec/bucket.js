@@ -1,5 +1,8 @@
 'use strict';
 
+var chai = require("chai");
+var expect = chai.expect;
+
 var Bucket = require('../../lib/bucket.js');
 
 describe('The Bucket', function () {
